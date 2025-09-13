@@ -1,0 +1,569 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pangram Bee</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .container {
+            background: white;
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            max-width: 600px;
+            width: 100%;
+        }
+
+        h1 {
+            text-align: center;
+            color: #333;
+            margin-bottom: 10px;
+            font-size: 2.5em;
+        }
+
+        .subtitle {
+            text-align: center;
+            color: #666;
+            margin-bottom: 30px;
+            font-size: 1.1em;
+        }
+
+        .hexagon-container {
+            position: relative;
+            width: 280px;
+            height: 280px;
+            margin: 0 auto 30px;
+        }
+
+        .hex-letter {
+            position: absolute;
+            width: 70px;
+            height: 70px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            clip-path: polygon(30% 0%, 70% 0%, 100% 30%, 100% 70%, 70% 100%, 30% 100%, 0% 70%, 0% 30%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 28px;
+            font-weight: bold;
+            color: white;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+        }
+
+        .hex-letter:hover {
+            transform: scale(1.1);
+            filter: brightness(1.2);
+        }
+
+        .hex-letter.center {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            left: 50%;
+            top: 50%;
+            transform: translate(-50%, -50%);
+        }
+
+        .hex-letter.center:hover {
+            transform: translate(-50%, -50%) scale(1.1);
+        }
+
+        .hex-letter.top {
+            left: 50%;
+            top: 20px;
+            transform: translateX(-50%);
+        }
+
+        .hex-letter.top-right {
+            right: 60px;
+            top: 60px;
+        }
+
+        .hex-letter.bottom-right {
+            right: 60px;
+            bottom: 60px;
+        }
+
+        .hex-letter.bottom {
+            left: 50%;
+            bottom: 20px;
+            transform: translateX(-50%);
+        }
+
+        .hex-letter.bottom-left {
+            left: 60px;
+            bottom: 60px;
+        }
+
+        .hex-letter.top-left {
+            left: 60px;
+            top: 60px;
+        }
+
+        .input-container {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        #wordInput {
+            flex: 1;
+            padding: 15px;
+            font-size: 18px;
+            border: 2px solid #ddd;
+            border-radius: 10px;
+            outline: none;
+            transition: border-color 0.3s;
+            text-transform: uppercase;
+        }
+
+        #wordInput:focus {
+            border-color: #667eea;
+        }
+
+        .btn {
+            padding: 15px 25px;
+            font-size: 16px;
+            font-weight: bold;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.3s;
+            text-transform: uppercase;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        }
+
+        .btn-secondary {
+            background: #f0f0f0;
+            color: #333;
+        }
+
+        .btn-secondary:hover {
+            background: #e0e0e0;
+        }
+
+        .controls {
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+            margin-bottom: 20px;
+        }
+
+        .message {
+            text-align: center;
+            padding: 15px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            font-weight: bold;
+            display: none;
+        }
+
+        .message.success {
+            background: #d4edda;
+            color: #155724;
+            display: block;
+        }
+
+        .message.error {
+            background: #f8d7da;
+            color: #721c24;
+            display: block;
+        }
+
+        .message.info {
+            background: #d1ecf1;
+            color: #0c5460;
+            display: block;
+        }
+
+        .found-words {
+            margin-top: 20px;
+            padding: 20px;
+            background: #f9f9f9;
+            border-radius: 10px;
+        }
+
+        .found-words h3 {
+            color: #333;
+            margin-bottom: 10px;
+        }
+
+        .word-list {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .word-item {
+            padding: 8px 15px;
+            background: white;
+            border-radius: 20px;
+            border: 2px solid #ddd;
+            font-weight: bold;
+            color: #667eea;
+        }
+
+        .word-item.revealed {
+            background: #fff3cd;
+            border-color: #ffc107;
+            color: #856404;
+        }
+
+        .stats {
+            display: flex;
+            justify-content: space-around;
+            margin-bottom: 20px;
+            padding: 15px;
+            background: #f9f9f9;
+            border-radius: 10px;
+        }
+
+        .stat-item {
+            text-align: center;
+        }
+
+        .stat-value {
+            font-size: 24px;
+            font-weight: bold;
+            color: #667eea;
+        }
+
+        .stat-label {
+            font-size: 14px;
+            color: #666;
+            margin-top: 5px;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 50px;
+            font-size: 20px;
+            color: #666;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <h1>🐝 Pangram Bee</h1>
+        <p class="subtitle">Find the word that uses all 7 letters!</p>
+
+        <div id="loading" class="loading">Loading game...</div>
+
+        <div id="gameContent" style="display: none;">
+            <div class="stats">
+                <div class="stat-item">
+                    <div class="stat-value" id="foundCount">0</div>
+                    <div class="stat-label">Pangrams Found</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-value" id="totalCount">-</div>
+                    <div class="stat-label">Total Pangrams</div>
+                </div>
+            </div>
+
+            <div class="hexagon-container" id="hexagonContainer">
+                <div class="hex-letter center" id="centerLetter"></div>
+                <div class="hex-letter top" data-position="0"></div>
+                <div class="hex-letter top-right" data-position="1"></div>
+                <div class="hex-letter bottom-right" data-position="2"></div>
+                <div class="hex-letter bottom" data-position="3"></div>
+                <div class="hex-letter bottom-left" data-position="4"></div>
+                <div class="hex-letter top-left" data-position="5"></div>
+            </div>
+
+            <div class="input-container">
+                <input type="text" id="wordInput" placeholder="Type your word..." autocomplete="off">
+                <button class="btn btn-primary" onclick="checkWord()">Submit</button>
+            </div>
+
+            <div class="controls">
+                <button class="btn btn-secondary" onclick="shuffleLetters()">🔄 Shuffle</button>
+                <button class="btn btn-secondary" onclick="clearInput()">Clear</button>
+                <button class="btn btn-secondary" onclick="showAnswer()">💡 Show Answer</button>
+                <button class="btn btn-secondary" onclick="newPuzzle()">New Puzzle</button>
+            </div>
+
+            <div id="message" class="message"></div>
+
+            <div class="found-words" id="foundWordsContainer" style="display: none;">
+                <h3>Pangrams Found:</h3>
+                <div class="word-list" id="foundWordsList"></div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let wordList = [];
+        let currentLetters = [];
+        let centerLetter = '';
+        let currentPangrams = [];
+        let foundPangrams = [];
+        let revealedPangrams = [];
+        let puzzles = [];
+        let currentPuzzleIndex = 0;
+
+        async function loadWordList() {
+            try {
+                const response = await fetch('3of6game.txt');
+                const text = await response.text();
+                wordList = text.split('\n').map(word => word.trim().replace(/\$/g, '').toLowerCase()).filter(word => word.length >= 7);
+                generatePuzzles();
+                initGame();
+            } catch (error) {
+                console.error('Error loading word list:', error);
+                document.getElementById('loading').innerHTML = 'Error loading word list. Please refresh the page.';
+            }
+        }
+
+        function generatePuzzles() {
+            const pangramSets = new Map();
+
+            for (const word of wordList) {
+                const uniqueLetters = [...new Set(word.split(''))];
+                if (uniqueLetters.length === 7) {
+                    const key = uniqueLetters.sort().join('');
+                    if (!pangramSets.has(key)) {
+                        pangramSets.set(key, {
+                            letters: uniqueLetters,
+                            pangrams: []
+                        });
+                    }
+                    pangramSets.get(key).pangrams.push(word);
+                }
+            }
+
+            puzzles = Array.from(pangramSets.values()).filter(set => set.pangrams.length >= 1);
+
+            puzzles.sort((a, b) => b.pangrams.length - a.pangrams.length);
+
+            puzzles = puzzles.slice(0, 100);
+        }
+
+        function initGame() {
+            if (puzzles.length === 0) {
+                document.getElementById('loading').innerHTML = 'No valid puzzles found. Please check the word list.';
+                return;
+            }
+
+            currentPuzzleIndex = Math.floor(Math.random() * puzzles.length);
+            loadPuzzle();
+
+            document.getElementById('loading').style.display = 'none';
+            document.getElementById('gameContent').style.display = 'block';
+
+            document.getElementById('wordInput').addEventListener('keypress', function (e) {
+                if (e.key === 'Enter') {
+                    checkWord();
+                }
+            });
+
+            const hexLetters = document.querySelectorAll('.hex-letter:not(.center)');
+            hexLetters.forEach(hex => {
+                hex.addEventListener('click', function () {
+                    const letter = this.textContent;
+                    document.getElementById('wordInput').value += letter;
+                    document.getElementById('wordInput').focus();
+                });
+            });
+
+            document.querySelector('.hex-letter.center').addEventListener('click', function () {
+                const letter = this.textContent;
+                document.getElementById('wordInput').value += letter;
+                document.getElementById('wordInput').focus();
+            });
+        }
+
+        function loadPuzzle() {
+            const puzzle = puzzles[currentPuzzleIndex];
+            currentLetters = [...puzzle.letters];
+            centerLetter = currentLetters[Math.floor(Math.random() * currentLetters.length)];
+
+            currentPangrams = [];
+            for (const word of wordList) {
+                if (word.length >= 7 && word.includes(centerLetter)) {
+                    const wordLetters = [...new Set(word.split(''))];
+                    if (wordLetters.length === 7 && wordLetters.every(l => currentLetters.includes(l))) {
+                        currentPangrams.push(word);
+                    }
+                }
+            }
+
+            foundPangrams = [];
+            revealedPangrams = [];
+            updateDisplay();
+            updateStats();
+        }
+
+        function updateDisplay() {
+            document.getElementById('centerLetter').textContent = centerLetter;
+
+            const outerLetters = currentLetters.filter(l => l !== centerLetter);
+            const hexPositions = document.querySelectorAll('.hex-letter:not(.center)');
+
+            hexPositions.forEach((hex, index) => {
+                if (index < outerLetters.length) {
+                    hex.textContent = outerLetters[index];
+                }
+            });
+        }
+
+        function shuffleLetters() {
+            const outerLetters = currentLetters.filter(l => l !== centerLetter);
+            for (let i = outerLetters.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [outerLetters[i], outerLetters[j]] = [outerLetters[j], outerLetters[i]];
+            }
+
+            const hexPositions = document.querySelectorAll('.hex-letter:not(.center)');
+            hexPositions.forEach((hex, index) => {
+                hex.textContent = outerLetters[index];
+            });
+        }
+
+        function checkWord() {
+            const input = document.getElementById('wordInput').value.toLowerCase().trim();
+            const messageEl = document.getElementById('message');
+
+            if (!input) {
+                showMessage('Please enter a word', 'error');
+                return;
+            }
+
+            if (input.length < 7) {
+                showMessage('Word must be at least 7 letters long', 'error');
+                return;
+            }
+
+            if (!input.includes(centerLetter)) {
+                showMessage(`Word must include the center letter '${centerLetter.toUpperCase()}'`, 'error');
+                return;
+            }
+
+            const inputLetters = [...new Set(input.split(''))];
+            if (!inputLetters.every(l => currentLetters.includes(l))) {
+                showMessage('Word contains invalid letters', 'error');
+                return;
+            }
+
+            if (inputLetters.length !== 7) {
+                showMessage('Not a pangram! Must use all 7 letters', 'error');
+                return;
+            }
+
+            if (foundPangrams.includes(input)) {
+                showMessage('Already found!', 'error');
+                return;
+            }
+
+            if (currentPangrams.includes(input)) {
+                foundPangrams.push(input);
+                showMessage('🎉 Pangram found! Excellent!', 'success');
+                updateFoundWords();
+                updateStats();
+                clearInput();
+
+                if (foundPangrams.length === currentPangrams.length) {
+                    setTimeout(() => {
+                        showMessage('🏆 Amazing! You found all pangrams!', 'success');
+                    }, 1500);
+                }
+            } else {
+                showMessage('Valid letters but not in our dictionary', 'error');
+            }
+        }
+
+        function updateFoundWords() {
+            const container = document.getElementById('foundWordsContainer');
+            const list = document.getElementById('foundWordsList');
+
+            if (foundPangrams.length > 0) {
+                container.style.display = 'block';
+                list.innerHTML = foundPangrams.map(word => {
+                    const isRevealed = revealedPangrams.includes(word);
+                    return `<div class="word-item${isRevealed ? ' revealed' : ''}">${word.toUpperCase()}${isRevealed ? ' 💡' : ''}</div>`;
+                }).join('');
+            }
+        }
+
+        function updateStats() {
+            document.getElementById('foundCount').textContent = foundPangrams.length;
+            document.getElementById('totalCount').textContent = currentPangrams.length;
+        }
+
+        function showMessage(text, type) {
+            const messageEl = document.getElementById('message');
+            messageEl.textContent = text;
+            messageEl.className = `message ${type}`;
+
+            setTimeout(() => {
+                messageEl.className = 'message';
+            }, 3000);
+        }
+
+        function clearInput() {
+            document.getElementById('wordInput').value = '';
+        }
+
+        function newPuzzle() {
+            currentPuzzleIndex = Math.floor(Math.random() * puzzles.length);
+            loadPuzzle();
+            clearInput();
+            document.getElementById('foundWordsContainer').style.display = 'none';
+            showMessage('New puzzle loaded!', 'info');
+        }
+
+        function showAnswer() {
+            const unfoundPangrams = currentPangrams.filter(p => !foundPangrams.includes(p));
+
+            if (unfoundPangrams.length === 0) {
+                showMessage('All pangrams already found!', 'info');
+                return;
+            }
+
+            const randomPangram = unfoundPangrams[Math.floor(Math.random() * unfoundPangrams.length)];
+            foundPangrams.push(randomPangram);
+            revealedPangrams.push(randomPangram);
+
+            showMessage(`💡 Answer revealed: ${randomPangram.toUpperCase()}`, 'info');
+            updateFoundWords();
+            updateStats();
+
+            if (foundPangrams.length === currentPangrams.length) {
+                setTimeout(() => {
+                    showMessage('🏆 All pangrams found!', 'success');
+                }, 1500);
+            }
+        }
+
+        window.addEventListener('load', loadWordList);
+    </script>
+</body>
+
+</html>
