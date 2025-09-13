@@ -173,6 +173,7 @@
             gap: 10px;
             justify-content: center;
             margin-bottom: 20px;
+            flex-wrap: wrap;
         }
 
         .message {
@@ -265,6 +266,182 @@
             padding: 50px;
             font-size: 20px;
             color: #666;
+        }
+
+        @media (max-width: 768px) {
+            body {
+                padding: 10px;
+            }
+
+            .container {
+                padding: 20px;
+                border-radius: 15px;
+            }
+
+            h1 {
+                font-size: 1.8em;
+                margin-bottom: 8px;
+            }
+
+            .subtitle {
+                font-size: 0.9em;
+                margin-bottom: 20px;
+            }
+
+            .hexagon-container {
+                width: 240px;
+                height: 240px;
+                margin: 0 auto 20px;
+            }
+
+            .hex-letter {
+                width: 60px;
+                height: 60px;
+                font-size: 22px;
+            }
+
+            .hex-letter.top {
+                top: 15px;
+            }
+
+            .hex-letter.top-right {
+                right: 50px;
+                top: 50px;
+            }
+
+            .hex-letter.bottom-right {
+                right: 50px;
+                bottom: 50px;
+            }
+
+            .hex-letter.bottom {
+                bottom: 15px;
+            }
+
+            .hex-letter.bottom-left {
+                left: 50px;
+                bottom: 50px;
+            }
+
+            .hex-letter.top-left {
+                left: 50px;
+                top: 50px;
+            }
+
+            .input-container {
+                flex-direction: column;
+                gap: 10px;
+            }
+
+            #wordInput {
+                padding: 12px;
+                font-size: 16px;
+            }
+
+            .btn {
+                padding: 12px 20px;
+                font-size: 14px;
+                width: 100%;
+            }
+
+            .input-container .btn {
+                width: 100%;
+            }
+
+            .controls {
+                gap: 8px;
+            }
+
+            .controls .btn {
+                flex: 1 1 calc(50% - 4px);
+                min-width: 120px;
+                padding: 10px 15px;
+            }
+
+            .stats {
+                padding: 12px;
+                gap: 15px;
+            }
+
+            .stat-value {
+                font-size: 20px;
+            }
+
+            .stat-label {
+                font-size: 12px;
+            }
+
+            .message {
+                padding: 12px;
+                font-size: 14px;
+            }
+
+            .found-words {
+                padding: 15px;
+            }
+
+            .found-words h3 {
+                font-size: 1.1em;
+            }
+
+            .word-item {
+                padding: 6px 12px;
+                font-size: 14px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .container {
+                padding: 15px;
+            }
+
+            h1 {
+                font-size: 1.5em;
+            }
+
+            .hexagon-container {
+                width: 200px;
+                height: 200px;
+            }
+
+            .hex-letter {
+                width: 50px;
+                height: 50px;
+                font-size: 18px;
+            }
+
+            .hex-letter.top {
+                top: 10px;
+            }
+
+            .hex-letter.top-right {
+                right: 40px;
+                top: 40px;
+            }
+
+            .hex-letter.bottom-right {
+                right: 40px;
+                bottom: 40px;
+            }
+
+            .hex-letter.bottom {
+                bottom: 10px;
+            }
+
+            .hex-letter.bottom-left {
+                left: 40px;
+                bottom: 40px;
+            }
+
+            .hex-letter.top-left {
+                left: 40px;
+                top: 40px;
+            }
+
+            .controls .btn {
+                flex: 1 1 100%;
+                min-width: auto;
+            }
         }
     </style>
 </head>
